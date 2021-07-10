@@ -21,7 +21,7 @@ const Nav = styled.nav`
 const Navigation = () => {
 
     const { user } = useContext(FirebaseContex)
-    console.log(user)
+
     return (
         <Nav>
             <Link href="/">Inicio</Link>
