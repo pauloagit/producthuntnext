@@ -1,7 +1,7 @@
-import React from 'react';
-import styled from '@emotion/styled'
-import formatDistanceToNow from 'date-fns/formatDistanceToNow';
-import { es } from 'date-fns/locale'
+import React from "react"
+import styled from "@emotion/styled"
+import formatDistanceToNow from "date-fns/formatDistanceToNow"
+import { es } from "date-fns/locale"
 
 const Product = styled.li`
   padding: 4rem;
@@ -22,11 +22,10 @@ const Title = styled.a`
   font-size: 2rem;
   font-weight: bold;
   margin: 0;
-  
+
   :hover {
     cursor: pointer;
   }
-  
 `
 
 const TextDescription = styled.div`
@@ -36,31 +35,31 @@ const TextDescription = styled.div`
 `
 
 const Comments = styled.div`
-    margin-top: 2rem;
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+
+  div {
     display: flex;
     align-items: center;
-    
-    div {
-      display: flex;
-      align-items: center;
-      border: 1px solid #e1e1e1;
-      padding: .3rem 1rem;
-      margin-right: 2rem;
+    border: 1px solid #e1e1e1;
+    padding: 0.3rem 1rem;
+    margin-right: 2rem;
+  }
+
+  img {
+    width: 2rem;
+    margin-right: 2rem;
+  }
+
+  p {
+    font-size: 1.6rem;
+    margin-right: 1rem;
+    font-weight: 700;
+    &:last-of-type {
+      margin: 0;
     }
-    
-    img {
-      width: 2rem;
-      margin-right: 2rem;
-    }
-    
-    p {
-      font-size: 1.6rem;
-      margin-right: 1rem;
-      font-weight: 700;
-      &:last-of-type {
-        margin: 0;
-      }
-    }
+  }
 `
 
 const Votes = styled.div`
@@ -68,11 +67,11 @@ const Votes = styled.div`
   text-align: center;
   border: 1px solid #e1e1e1;
   padding: 1rem 3rem;
-  
+
   div {
     font-size: 2rem;
   }
-  
+
   p {
     margin: 0;
     font-size: 2rem;
@@ -81,52 +80,61 @@ const Votes = styled.div`
 `
 
 const Img = styled.img`
-    width: 20rem;
+  width: 20rem;
 `
 
-const ProductDetails = ({product}) => {
-    const { id, name, company, image, url, description, votes, urlImage, created, comments } = product
+const ProductDetails = ({ product }) => {
+  const {
+    id,
+    name,
+    company,
+    image,
+    url,
+    description,
+    votes,
+    urlImage,
+    created,
+    comments,
+  } = product
 
-    return (
-        <Product>
-            <ProductDescription>
-                <div>
-                    <Img src={urlImage}/>
-                </div>
+  return (
+    <Product>
+      <ProductDescription>
+        <div>
+          <Img src={urlImage} />
+        </div>
 
-                <div>
-                    <Title>{name}</Title>
+        <div>
+          <Title>{name}</Title>
 
-                    <TextDescription>{description}</TextDescription>
+          <TextDescription>{description}</TextDescription>
 
+          <Comments>
+            <div>
+              <img
+                src="/static/img/comentario.png"
+                width="20px"
+                height="20px"
+              />
+              <p>{comments.length} Comentarios</p>
+            </div>
+          </Comments>
 
-                    <Comments>
-                        <div>
-                            <img
-                                src="/static/img/comentario.png"
-                                width='20px'
-                                height='20px'
-                            />
-                            <p>{comments.length} Comentarios</p>
-                        </div>
+          <div>
+            <p>
+              Publicado:{" "}
+              {formatDistanceToNow(new Date(created), { locale: es })}
+            </p>
+          </div>
+        </div>
+      </ProductDescription>
 
-                    </Comments>
+      <Votes>
+        <div>&#9650;</div>
+        <p>{votes}</p>
+      </Votes>
+    </Product>
+  )
+}
 
-                    <div>
-                        <p>Publicado: { formatDistanceToNow(new Date(created), { locale: es})}</p>
-                    </div>
-
-                </div>
-
-
-            </ProductDescription>
-
-            <Votes>
-                <div>&#9650;</div>
-                <p>{ votes }</p>
-            </Votes>
-        </Product>
-    );
-};
-
-export default ProductDetails;
+export default ProductDetails

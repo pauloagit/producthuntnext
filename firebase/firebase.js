@@ -1,37 +1,40 @@
-import app from 'firebase/app'
-import 'firebase/auth'
-import firebaseConfig from "./config";
-import 'firebase/firestore';
-import 'firebase/storage'
+import app from "firebase/app"
+import "firebase/auth"
+import firebaseConfig from "./config"
+import "firebase/firestore"
+import "firebase/storage"
 
 class Firebase {
-    constructor() {
-        if(!app.apps.length) {
-            app.initializeApp(firebaseConfig)
-        }
-        this.auth = app.auth()
-        this.db = app.firestore()
-        this.storage = app.storage()
+  constructor() {
+    if (!app.apps.length) {
+      app.initializeApp(firebaseConfig)
     }
+    this.auth = app.auth()
+    this.db = app.firestore()
+    this.storage = app.storage()
+  }
 
-    // User register
-    async register(name, email, password) {
-        const newUser = await this.auth.createUserWithEmailAndPassword(email, password)
+  // User register
+  async register(name, email, password) {
+    const newUser = await this.auth.createUserWithEmailAndPassword(
+      email,
+      password
+    )
 
-        return await newUser.user.updateProfile({
-            displayName : name
-        })
-    }
+    return await newUser.user.updateProfile({
+      displayName: name,
+    })
+  }
 
-    // Login user
-    async login(email, password) {
-        return this.auth.signInWithEmailAndPassword(email, password)
-    }
+  // Login user
+  async login(email, password) {
+    return this.auth.signInWithEmailAndPassword(email, password)
+  }
 
-    // Log off user
-    async logoff() {
-        await this.auth.signOut()
-    }
+  // Log off user
+  async logoff() {
+    await this.auth.signOut()
+  }
 }
 
 const firebase = new Firebase()

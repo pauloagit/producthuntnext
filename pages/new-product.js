@@ -1,216 +1,200 @@
-import React, { useState, useContext } from 'react'
-import { css } from '@emotion/react'
-import Router, { useRouter } from 'next/router'
-import FirebaseFileUploader from "react-firebase-file-uploader";
-import Layout from '../components/layout/Layout'
-import {
-    Form, Field, InputSubmit, Error,
-} from '../components/ui/Form'
+import React, { useState, useContext } from "react"
+import { css } from "@emotion/react"
+import Router, { useRouter } from "next/router"
+import FirebaseFileUploader from "react-firebase-file-uploader"
+import Layout from "../components/layout/Layout"
+import { Form, Field, InputSubmit, Error } from "../components/ui/Form"
 
-import { FirebaseContex } from '../firebase'
+import { FirebaseContex } from "../firebase"
 
 // Validations
-import useValidation from '../hooks/useValidation'
-import productCreateValidate from '../Validation/productCreateValidate'
+import useValidation from "../hooks/useValidation"
+import productCreateValidate from "../Validation/productCreateValidate"
 
 const INITIAL_STATE = {
-    name: '',
-    company: '',
-    image: '',
-    url: '',
-    description: '',
+  name: "",
+  company: "",
+  image: "",
+  url: "",
+  description: "",
 }
 const NewProduct = () => {
+  // images State
+  const [imageName, setImageName] = useState("")
+  const [uploading, setUploading] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [urlImage, setUrlImage] = useState("")
 
-    // images State
-    const [imageName, setImageName] = useState('')
-    const [uploading, setUploading] = useState(false)
-    const [progress, setProgress] = useState(0)
-    const [urlImage, setUrlImage] = useState('')
+  const [error, setError] = useState(false)
 
-    const [error, setError] = useState(false)
+  // routing hook for redirect
+  const router = useRouter()
 
-    // routing hook for redirect
-    const router = useRouter()
+  // Context with the CRUD firebase operation
+  const { user, firebase } = useContext(FirebaseContex)
 
-    // Context with the CRUD firebase operation
-    const { user, firebase } = useContext(FirebaseContex)
+  const { values, errors, handleSubmit, handleChange, handleBlur } =
+    useValidation(INITIAL_STATE, productCreateValidate, productCreate)
 
-    const {
-        values, errors, handleSubmit, handleChange, handleBlur,
-    } = useValidation(INITIAL_STATE, productCreateValidate, productCreate)
+  const { name, company, image, url, description } = values
 
-    const { name, company, image, url, description } = values
-
-    async function productCreate() {
-
-        // if the user is not authenticated, redirect to login
-        if (!user) {
-            return router.push('/login')
-        }
-
-        // Create the new product object
-        const product = {
-            name,
-            company,
-            url,
-            urlImage,
-            description,
-            votes: 0,
-            comments: [],
-            created: Date.now()
-        }
-
-        // Insert to Data Base
-        firebase.db.collection('products').add(product)
-
-        return router.push('/')
+  async function productCreate() {
+    // if the user is not authenticated, redirect to login
+    if (!user) {
+      return router.push("/login")
     }
 
-    const handleChangeUsername = event =>
-        this.setState({ username: event.target.value });
-
-    const handleUploadStart = () => {
-        setProgress(0)
-        setUploading(true)
+    // Create the new product object
+    const product = {
+      name,
+      company,
+      url,
+      urlImage,
+      description,
+      votes: 0,
+      comments: [],
+      created: Date.now(),
     }
 
-    const handleProgress = progress => {
-        setProgress(progress)
-    };
+    // Insert to Data Base
+    firebase.db.collection("products").add(product)
 
-    const handleUploadError = error => {
-        setUploading(error)
-        console.error(error);
-    };
+    return router.push("/")
+  }
 
-    const handleUploadSuccess = filename => {
-        setProgress(100)
-        setUploading(false)
-        setImageName(filename)
-        firebase
-            .storage
-            .ref("products")
-            .child(filename)
-            .getDownloadURL()
-            .then(url => {
-                console.log(url)
-                setUrlImage(url)
-            });
-    };
+  const handleChangeUsername = (event) =>
+    this.setState({ username: event.target.value })
 
-    return (
-        <Layout>
-            <>
-                <h1
-                    css={css`
-                        text-align: center;
-                        margin-right: 5rem;
-                    `}
-                >
-                    Nuevo Producto
-                </h1>
+  const handleUploadStart = () => {
+    setProgress(0)
+    setUploading(true)
+  }
 
-                <Form
-                    onSubmit={handleSubmit}
-                    noValidate
-                >
-                    <fieldset>
-                        <legend>Información General</legend>
+  const handleProgress = (progress) => {
+    setProgress(progress)
+  }
 
-                        <Field>
-                            <label htmlFor="name">Nombre</label>
-                            <input
-                                type="text"
-                                id="name"
-                                placeholder="Tu Nombre"
-                                name="name"
-                                value={name}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                            />
-                        </Field>
+  const handleUploadError = (error) => {
+    setUploading(error)
+    console.error(error)
+  }
 
-                        { errors.name && <Error>{errors.name}</Error>}
+  const handleUploadSuccess = (filename) => {
+    setProgress(100)
+    setUploading(false)
+    setImageName(filename)
+    firebase.storage
+      .ref("products")
+      .child(filename)
+      .getDownloadURL()
+      .then((url) => {
+        console.log(url)
+        setUrlImage(url)
+      })
+  }
 
-                        <Field>
-                            <label htmlFor="company">Empresa</label>
-                            <input
-                                type="text"
-                                id="company"
-                                placeholder="Tu Empresa"
-                                name="company"
-                                value={company}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                            />
-                        </Field>
+  return (
+    <Layout>
+      <>
+        <h1
+          css={css`
+            text-align: center;
+            margin-right: 5rem;
+          `}
+        >
+          Nuevo Producto
+        </h1>
 
-                        { errors.company && <Error>{errors.company}</Error>}
+        <Form onSubmit={handleSubmit} noValidate>
+          <fieldset>
+            <legend>Información General</legend>
 
-                        <Field>
-                            <label htmlFor="image">Imagen</label>
-                            <FirebaseFileUploader
-                                accept="image/*"
-                                id="image"
-                                name="image"
-                                randomizeFilename
-                                storageRef={firebase.storage.ref("products")}
-                                onUploadStart={handleUploadStart}
-                                onUploadError={handleUploadError}
-                                onUploadSuccess={handleUploadSuccess}
-                                onProgress={handleProgress}
+            <Field>
+              <label htmlFor="name">Nombre</label>
+              <input
+                type="text"
+                id="name"
+                placeholder="Tu Nombre"
+                name="name"
+                value={name}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </Field>
 
-                            />
-                        </Field>
+            {errors.name && <Error>{errors.name}</Error>}
 
-                        <Field>
-                            <label htmlFor="url">URL</label>
-                            <input
-                                type="url"
-                                id="url"
-                                placeholder="Url del Producto"
-                                name="url"
-                                value={url}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                            />
-                        </Field>
+            <Field>
+              <label htmlFor="company">Empresa</label>
+              <input
+                type="text"
+                id="company"
+                placeholder="Tu Empresa"
+                name="company"
+                value={company}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </Field>
 
-                        { errors.url && <Error>{errors.url}</Error>}
+            {errors.company && <Error>{errors.company}</Error>}
 
-                    </fieldset>
+            <Field>
+              <label htmlFor="image">Imagen</label>
+              <FirebaseFileUploader
+                accept="image/*"
+                id="image"
+                name="image"
+                randomizeFilename
+                storageRef={firebase.storage.ref("products")}
+                onUploadStart={handleUploadStart}
+                onUploadError={handleUploadError}
+                onUploadSuccess={handleUploadSuccess}
+                onProgress={handleProgress}
+              />
+            </Field>
 
-                    <fieldset>
-                        <legend>Sobre tu producto</legend>
+            <Field>
+              <label htmlFor="url">URL</label>
+              <input
+                type="url"
+                id="url"
+                placeholder="Url del Producto"
+                name="url"
+                value={url}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </Field>
 
-                        <Field>
-                            <label htmlFor="description">Descripción</label>
-                            <textarea
-                                id="description"
-                                placeholder="Describe tu Producto"
-                                name="description"
-                                value={description}
-                                onChange={handleChange}
-                                onBlur={handleBlur}
-                            />
-                        </Field>
+            {errors.url && <Error>{errors.url}</Error>}
+          </fieldset>
 
-                        { errors.description && <Error>{errors.description}</Error>}
+          <fieldset>
+            <legend>Sobre tu producto</legend>
 
-                    </fieldset>
+            <Field>
+              <label htmlFor="description">Descripción</label>
+              <textarea
+                id="description"
+                placeholder="Describe tu Producto"
+                name="description"
+                value={description}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+            </Field>
 
-                    { error && <Error>{error}</Error>}
+            {errors.description && <Error>{errors.description}</Error>}
+          </fieldset>
 
-                    <InputSubmit
-                        type="submit"
-                        value="Crear Producto"
-                    />
-                </Form>
-            </>
-        </Layout>
+          {error && <Error>{error}</Error>}
 
-    )
+          <InputSubmit type="submit" value="Crear Producto" />
+        </Form>
+      </>
+    </Layout>
+  )
 }
 
 export default NewProduct
