@@ -21,7 +21,7 @@ module.exports = {
   plugins: ["react"],
   rules: {
     "react/react-in-jsx-scope": RULES.OFF,
-    "no-unused-vars": RULES.ERROR,
+    "no-unused-vars": RULES.WARN,
     "react/prop-types": RULES.WARN,
   },
 }
